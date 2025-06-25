@@ -21,7 +21,9 @@ function setupGui() {
     probeCheckbox.changed(() => {
         probe = probeCheckbox.checked();
     });
-    probeCheckbox.checked(true); // Set default to checked
+    probe = false; // Default to not showing probe
+    probeCheckbox.checked(probe);
+
     
 
     recoveryTimeSlider.value(recoveryTime);

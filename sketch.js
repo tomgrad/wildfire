@@ -68,12 +68,13 @@ function draw() {
 function plotActivated() {
   history.shift();
   history.push(getInfectedCountInProbeArea());
+  probe_area = 3.14 * probe_r * probe_r;
   noFill();
   stroke(0);
   beginShape();
   for (let i = 0; i < history.length; i++) {
     let x = map(i, 0, history.length - 1, 0, WIDTH);
-    let y = map(history[i], 0, 1000, 0, plot_size);
+    let y = map(history[i]/probe_area, 0, 1, 0, plot_size);
     vertex(x, WIDTH + plot_size - y);
   }
   endShape();
@@ -111,32 +112,6 @@ function create2DArray(cols, rows, val) {
   }
   return arr;
 }
-
-
-// function drawGrid() {
-//   stroke(0);
-//   for (let i = 0; i < GRID_SIZE; i++) {
-//     for (let j = 0; j < GRID_SIZE; j++) {
-//       if (grid[i][j] === S) fill(255);
-//       else if (grid[i][j] === I) fill(255, 0, 0);
-//       else if (grid[i][j] === R) fill("black");
-//       rect(i * CELL_SIZE, j * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-//     }
-//   }
-// }
-
-
-// function drawGridWShades() {
-//   stroke(0);
-//   for (let i = 0; i < GRID_SIZE; i++) {
-//     for (let j = 0; j < GRID_SIZE; j++) {
-//       if (grid[i][j] === S) fill(255);
-//       else if (grid[i][j] === I) fill(infectionTime[i][j]/recoveryTime * 255, 0, 0);
-//       else if (grid[i][j] === R) fill(255-infectionTime[i][j]/immunityTime * 255);
-//       rect(i * CELL_SIZE, j * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-//     }
-//   }
-// }
 
 function asyncUpdateGrid() {
   let indices = [];
