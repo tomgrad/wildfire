@@ -1,0 +1,19 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 780px;
+  background-color: gray;
+
+}
+canvas {
+  display: block;
+}
+
+.panel {
+  float: right;
+  width: 200px;
+  background: lightgray;
+  padding: 10px 10px 10px 10px;
+  margin: 20px 20px;
+  font-size: 22px;
+}
