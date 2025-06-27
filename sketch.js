@@ -1,11 +1,12 @@
-const GRID_SIZE = 100;
-const CELL_SIZE = 5;
+const GRID_SIZE = 200;
+const CELL_SIZE = 3;
 
 const WIDTH = GRID_SIZE * CELL_SIZE;
 
-const S = 0;
-const I = 1;
-const R = 2;
+const S = 0;  // Susceptible
+const I = 1;  // Infected
+const R = 2;  // Recovered
+const W = 3;  // Wall
 
 let grid;
 let img;
@@ -22,6 +23,10 @@ let history = [];
 let plot_size = 200;
 let shades = true;
 
+let indices = [];
+
+let cmap;
+
 
 function setup() {
   createCanvas(WIDTH, WIDTH + plot_size);
@@ -31,6 +36,19 @@ function setup() {
   history = Array(32).fill(0);
   img = createImage(GRID_SIZE, GRID_SIZE);
   noSmooth();
+
+  for (let i = 0; i < GRID_SIZE; i++) {
+    for (let j = 0; j < GRID_SIZE; j++) {
+      indices.push([i, j]);
+    }
+  }
+
+  cmap = [
+    color(255, 255, 255), // Susceptible
+    color(255, 0, 0),     // Infected
+    color(0, 0, 0),       // Recovered
+    color(0, 0, 0, 0)     // Wall (transparent)
+  ]
 }
 
 function draw() {
@@ -47,11 +65,9 @@ function draw() {
         else img.set(x, y, color(0, 0, 0, 0)); // Transparent for any other state
       }
       else // No shades, just colors
-
-        if (grid[x][y] === S) img.set(x, y, color(255));
-        else if (grid[x][y] === I) img.set(x, y, color(255, 0, 0));
-        else if (grid[x][y] === R) img.set(x, y, color(0));
-        else img.set(x, y, color(0, 0, 0, 0)); // Transparent for any other state
+      {
+        img.set(x, y, cmap[grid[x][y]]);
+      }
 
   img.updatePixels();
   image(img, 0, 0, GRID_SIZE * CELL_SIZE, GRID_SIZE * CELL_SIZE);
@@ -74,7 +90,7 @@ function plotActivated() {
   beginShape();
   for (let i = 0; i < history.length; i++) {
     let x = map(i, 0, history.length - 1, 0, WIDTH);
-    let y = map(history[i]/probe_area, 0, 1, 0, plot_size);
+    let y = map(history[i] / probe_area, 0, 1, 0, plot_size);
     vertex(x, WIDTH + plot_size - y);
   }
   endShape();
@@ -84,7 +100,14 @@ function mousePressed() {
   let i = floor(mouseX / CELL_SIZE);
   let j = floor(mouseY / CELL_SIZE);
   if (i >= 0 && i < GRID_SIZE && j >= 0 && j < GRID_SIZE) {
-    if (grid[i][j] === S) {
+    if (keyIsDown(SHIFT)) {
+      if (grid[i][j] === W)
+        grid[i][j] = S; // Remove wall
+      else
+        grid[i][j] = W; // Place wall
+      infectionTime[i][j] = 0; // Reset infection time for walls
+    }
+    else if (grid[i][j] === S) {
       grid[i][j] = I;
       infectionTime[i][j] = recoveryTime;
     }
@@ -114,12 +137,7 @@ function create2DArray(cols, rows, val) {
 }
 
 function asyncUpdateGrid() {
-  let indices = [];
-  for (let i = 0; i < GRID_SIZE; i++) {
-    for (let j = 0; j < GRID_SIZE; j++) {
-      indices.push([i, j]);
-    }
-  }
+
 
   shuffle(indices, true);
 
